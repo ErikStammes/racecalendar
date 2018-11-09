@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import { Table, Spin, Button, Tooltip }  from 'antd';
+import { Card, Icon, Tag, Row, Col, Table, Spin, Button, Tooltip }  from 'antd';
+// import Responsive from 'react-responsive';
 import * as actions from './state/actions/calendar'
 import AddRace from './elements/AddRace'
 
@@ -45,6 +46,8 @@ class RaceCalendar extends Component {
             return dateString[0].toUpperCase() + dateString.slice(1)
         }
     }
+
+
 
     render() {
         const { races, loading, error, addParticipant, removeParticipant, user } = this.props
@@ -159,8 +162,7 @@ class RaceCalendar extends Component {
                 )}
         
           }];
-        let data = races;
-        data.forEach(race => {
+        races.forEach(race => {
             race.participants = race.participants.map(pcps => {
                 return pcps.name ? pcps.name : pcps
             })
@@ -168,9 +170,31 @@ class RaceCalendar extends Component {
                 return pcp.name ? pcp.name : pcp
             })
         });
+        let styles = {
+            card: {
+                marginTop: 20, 
+                marginRight: 20, 
+                width: 300,
+                maxWidth: '100%', 
+                display: 'inline-block'
+            }
+        }
+
         return (
             <div>
-                <Table dataSource={data} columns={columns} rowKey={record => record.name + record.location} scroll={{ x: 1200 }}/>
+                {races.map(race => 
+                {
+                return (  
+                    <Card title={race.name}  style={styles.card} key={race.name + race.location} actions={[<Icon type="setting" />, <Icon type="edit" />]}>
+                        <div><strong>Datum:</strong> {this.parseDate(race.date)}</div>
+                        <div><strong>Locatie:</strong> {race.location}</div>
+                        <div><strong>Deelnemers:</strong> 
+                            {race.participants.map(p => {return (<Tag color="blue" style={{margin:3}} key={p}>{p}</Tag>)})}
+                            {race.registered_participants.map(p => {return (<Tag color="blue" style={{margin:3}} key={p}>{p}</Tag>)})}
+                        </div>
+                    </Card>
+                )})}
+                {/* <Table dataSource={data} columns={columns} rowKey={record => record.name + record.location} scroll={{ x: 1200 }}/> */}
                 {(user.role !== "racer") && <AddRace />}
             </div>
         )

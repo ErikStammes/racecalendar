@@ -9,3 +9,11 @@
   word-break: keep-all;
 }
 
+.ant-card-body {
+  min-height: 200px;
+  max-height: 300px;
+}
+
+.ant-card-bordered {
+  vertical-align: top;
+}
