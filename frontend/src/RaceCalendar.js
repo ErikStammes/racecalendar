@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import { Card, Icon, Tag, Row, Col, Table, Spin, Button, Tooltip }  from 'antd';
-// import Responsive from 'react-responsive';
+import { Card, Icon, Tag, Spin, Button, Tooltip }  from 'antd';
 import * as actions from './state/actions/calendar'
 import AddRace from './elements/AddRace'
 
@@ -67,101 +66,6 @@ class RaceCalendar extends Component {
                 </Spin>
             )
         }
-        const columns = [{
-            title: 'Wedstrijd',
-            dataIndex: 'name',
-            key: 'name',
-            fixed: 'left',
-            width: 250,
-          }, {
-            title: 'Datum',
-            dataIndex: 'date',
-            key: 'date',
-            width: 170,
-            render: (text, record) => {
-                return (<span>{this.parseDate(record.date)}</span>)
-            }
-          }, {
-            title: 'Tot',
-            dataIndex: 'endDate',
-            key: 'endDate',
-            width: 170,
-            render: (text, record) => {
-                return (<span>{this.parseDate(record.endDate)}</span>)
-            }
-          }, {
-            title: 'Locatie',
-            dataIndex: 'location',
-            key: 'location',
-          }, {
-            title: 'Tijdstip',
-            dataIndex: 'time',
-            key: 'time'
-          }, {
-            title: 'Inschrijven',
-            dataIndex: 'register',
-            key: 'register',
-            render: (text, record) => {
-                if (record.register) { 
-                    return (<Button type="dashed" href={record.register} target="_blank">Inschrijven</Button>)
-                } else {
-                    return (<span/>)
-                }
-            }
-          }, {
-            title: 'Ingeschreven',
-            dataIndex: 'registered_participants',
-            key: 'registered_participants',
-            render: (text, record) => {
-                return (<span>{record.registered_participants.join(', ')}</span>)
-            }
-          }, {
-            title: 'Wil meedoen',
-            dataIndex: 'participants',
-            key: 'participants',
-            render: (text, record) => {
-                return (<span>{record.participants.join(', ')}</span>)
-            }
-          }, {
-        //     title: 'Vervoer',
-        //     dataIndex: 'cars',
-        //     key: 'cars'
-        //   }, {
-            title: 'Bijzonderheden',
-            dataIndex: 'description',
-            key: 'description'
-          }, {
-            title: 'Acties',
-            key: 'actions',
-            fixed: 'right',
-            width: 120,
-            render: (text, record) => {
-                let added = record.participants.some(p => p === user.name)
-                let registered = record.registered_participants.some(r => r === user.name)
-                return (
-                <span>
-                    { record.canRegister ? (registered ?
-                        <Tooltip title="Ik heb me uitgeschreven">
-                            <Button onClick={() => removeParticipant(record._id, true)} type="danger" icon="close" style={{marginLeft:'5px'}}/>
-                        </Tooltip>                    
-                    :
-                        <Tooltip title="Ik heb me ingeschreven">
-                            <Button onClick={() => addParticipant(record._id, true)} type="primary" icon="check" style={{marginLeft:'5px'}}/>
-                        </Tooltip>
-                    ): ''}
-                    { added ? 
-                        <Tooltip title="Ik wil niet meer mee doen">
-                            <Button onClick={() => removeParticipant(record._id, false)} type="danger" icon="minus" style={{marginLeft:'5px'}}/>
-                        </Tooltip>
-                        :
-                        <Tooltip title="Ik wil mee doen">
-                            <Button onClick={() => addParticipant(record._id, false)} type="primary" icon="plus" style={{marginLeft:'5px'}}/>
-                        </Tooltip>
-                    }
-                </span>
-                )}
-        
-          }];
         races.forEach(race => {
             race.participants = race.participants.map(pcps => {
                 return pcps.name ? pcps.name : pcps
@@ -184,17 +88,46 @@ class RaceCalendar extends Component {
             <div>
                 {races.map(race => 
                 {
+                let actions = []
+                if (race.canRegister) {
+                    let registered = race.registered_participants.some(r => r === user.name)
+                    if (registered) {
+                        actions.push(<Tooltip title="Ik heb me uitgeschreven"><Icon type="close" style={{color: 'red'}} onClick={() => removeParticipant(race._id, true)}/> </Tooltip>)
+                    } else {
+                        actions.push(<Tooltip title="Ik heb me ingeschreven"><Icon type="check" style={{color: 'green'}} onClick={() => addParticipant(race._id, true)}/> </Tooltip>)
+                    }
+                }
+                let added = race.participants.some(p => p === user.name)
+                if (added) {
+                    actions.push(<Tooltip title="Ik wil niet meer doen"><Icon type="minus" style={{color: 'red'}} onClick={() => removeParticipant(race._id, false)} /></Tooltip>)
+                } else {
+                    actions.push(<Tooltip title="Ik wil mee doen"><Icon type="plus" style={{color: 'green'}} onClick={() => addParticipant(race._id, false)} /></Tooltip>)
+                }
                 return (  
-                    <Card title={race.name}  style={styles.card} key={race.name + race.location} actions={[<Icon type="setting" />, <Icon type="edit" />]}>
-                        <div><strong>Datum:</strong> {this.parseDate(race.date)}</div>
+                    <Card title={race.name}  style={styles.card} key={race.name + race.location} actions={actions}>
+                        <div><strong>Naam: </strong>{race.name}</div>
+                        <div><strong>Datum: </strong>
+                            {this.parseDate(race.date)}
+                            {race.endDate ? ' tot ' + this.parseDate(race.endDate) : ''}
+                        </div>
+                        <div><strong>Tijd: </strong>{race.time}</div>
                         <div><strong>Locatie:</strong> {race.location}</div>
+                        {race.register ? <div><strong>Inschrijven: </strong><a href={race.register}>klik hier</a></div> : ''}
+                        {race.description ? <div><strong>Bijzonderheden: </strong>{race.description}</div> : '' }
                         <div><strong>Deelnemers:</strong> 
-                            {race.participants.map(p => {return (<Tag color="blue" style={{margin:3}} key={p}>{p}</Tag>)})}
-                            {race.registered_participants.map(p => {return (<Tag color="blue" style={{margin:3}} key={p}>{p}</Tag>)})}
+                            {race.participants.map(p => {
+                                if (race.canRegister) {
+                                    return (<Tooltip title="Heeft zich nog niet ingeschreven" key={p}><Tag color="blue" style={{margin:3}}>{p}</Tag></Tooltip>)
+                                } else {
+                                    return (<Tag color="blue" style={{margin:3}} key={p}>{p}</Tag>)
+                                }
+                            })}
+                            {race.registered_participants.map(p => {
+                                return (<Tooltip title="Heeft zich ingeschreven" key={p}><Tag color="blue" style={{margin:3}}>{p}<Icon type="check" /></Tag></Tooltip>)
+                            })}
                         </div>
                     </Card>
                 )})}
-                {/* <Table dataSource={data} columns={columns} rowKey={record => record.name + record.location} scroll={{ x: 1200 }}/> */}
                 {(user.role !== "racer") && <AddRace />}
             </div>
         )
