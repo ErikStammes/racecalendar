@@ -99,7 +99,7 @@ class Register extends Component {
                     {error && <h3 style={{color: 'red'}}>{error.response.data.message}</h3>}
                         <div style={{padding: 24, background: '#fff', borderRadius: '8px'}}>
                             <Form onSubmit={this.handleSubmit}>
-                                <FormItem {...formItemLayout} label="Naam">
+                                <FormItem {...formItemLayout} label="Voornaam">
                                     {getFieldDecorator('name',
                                         {rules: [{required: true, message: 'Vul een naam in'}]})(
                                         <Input />
@@ -132,9 +132,6 @@ class Register extends Component {
                 <Col span={6}></Col>
             </Row>
         </Content>
-    <Footer style={{ textAlign: 'center' }}>
-        © TeamSKITS
-    </Footer>
 </Layout>
         }
         </div>

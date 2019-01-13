@@ -81,9 +81,6 @@ class Login extends Component {
                 <Col span={6}></Col>
               </Row>
               </Content>
-              <Footer style={{ textAlign: 'center' }}>
-                © TeamSKITS
-              </Footer>
           </Layout>
         }
       </div>

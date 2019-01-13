@@ -4,8 +4,8 @@ import './App.css';
 import * as actions from './state/actions/login'
 import RaceCalendar from './RaceCalendar'
 import Login from './Login'
-import { Layout, Menu, Icon, Button } from 'antd';
-const { Header, Content, Footer, Sider } = Layout;
+import { Layout, Button } from 'antd';
+const { Header, Content } = Layout;
 
 const mapState = (store) => {
   return ({
@@ -83,9 +83,6 @@ class App extends Component {
               {sessionStorage.jwt ? <RaceCalendar /> : <Login/>}
             </div>
           </Content>
-          <Footer style={{ textAlign: 'center' }}>
-            © TeamSKITS
-          </Footer>
         </Layout>
       </Layout>
     );
