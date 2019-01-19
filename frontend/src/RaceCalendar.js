@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import { Card, Icon, Tag, Spin, Button, Tooltip }  from 'antd';
+import { Card, Icon, Tag, Spin, Tooltip, Popconfirm }  from 'antd';
 import * as actions from './state/actions/calendar'
 import AddRace from './elements/AddRace'
 
@@ -78,9 +78,12 @@ class RaceCalendar extends Component {
             card: {
                 marginTop: 20, 
                 marginRight: 20, 
-                width: 300,
+                width: 350,
                 maxWidth: '100%', 
                 display: 'inline-block'
+            },
+            actionButton: {
+                fontSize: '12px'
             }
         }
 
@@ -92,16 +95,39 @@ class RaceCalendar extends Component {
                 if (race.canRegister) {
                     let registered = race.registered_participants.some(r => r === user.name)
                     if (registered) {
-                        actions.push(<Tooltip title="Ik heb me uitgeschreven"><Icon type="close" style={{color: 'red'}} onClick={() => removeParticipant(race._id, true)}/> </Tooltip>)
+                        actions.push(
+                            <div onClick={() => removeParticipant(race._id, true)}>
+                                <Icon type="close" style={{color: 'red'}}/>
+                                <p style={styles.actionButton}>Ik heb me uitgeschreven</p>
+                            </div>
+                        )
                     } else {
-                        actions.push(<Tooltip title="Ik heb me ingeschreven"><Icon type="check" style={{color: 'green'}} onClick={() => addParticipant(race._id, true)}/> </Tooltip>)
+                        actions.push(
+                            <div onClick={() => addParticipant(race._id, true)}>
+                                <Icon type="check" style={{color: 'green'}}/>
+                                <p style={styles.actionButton}>Ik heb me ingeschreven</p>
+                            </div>
+                        )
                     }
                 }
                 let added = race.participants.some(p => p === user.name)
                 if (added) {
-                    actions.push(<Tooltip title="Ik wil niet meer doen"><Icon type="minus" style={{color: 'red'}} onClick={() => removeParticipant(race._id, false)} /></Tooltip>)
+                    actions.push(
+                        <div onClick={() => removeParticipant(race._id, false)}>
+                            <Icon type="minus" style={{color: 'red'}}/>
+                            <p style={styles.actionButton}>Ik wil niet meer mee doen</p>
+                        </div>
+                    )
                 } else {
-                    actions.push(<Tooltip title="Ik wil mee doen"><Icon type="plus" style={{color: 'green'}} onClick={() => addParticipant(race._id, false)} /></Tooltip>)
+                    actions.push(
+                        <div onClick={() => addParticipant(race._id, false)}>
+                            <Icon type="plus" style={{color: 'green'}}/>
+                            <p style={styles.actionButton}>Ik wil meedoen</p>
+                        </div>
+                    )
+                }
+                let goToMK = (url) => {
+                    window.open(url)
                 }
                 return (  
                     <Card title={race.name}  style={styles.card} key={race.name + race.location} actions={actions}>
@@ -112,7 +138,20 @@ class RaceCalendar extends Component {
                         </div>
                         <div><strong>Tijd: </strong>{race.time}</div>
                         <div><strong>Locatie:</strong> {race.location}</div>
-                        {race.register ? <div><strong>Inschrijven: </strong><a href={race.register}>klik hier</a></div> : ''}
+                        {race.register ? 
+                            race.register.includes('mijnknwu.knwu.nl') ?
+                                <div><strong>Inschrijven: </strong>
+                                    <Popconfirm title={<p>Deze link verwijst naar MijnKNWU en werkt dus<br/> alleen als je bent ingelogd op MijnKNWU</p>}
+                                                onConfirm={() => goToMK(race.register)}
+                                                okText="Naar MijnKNWU"
+                                                cancelText="Annuleren">
+                                        <a href={race.register}>klik hier</a>
+                                    </Popconfirm>
+                                </div>
+                                :
+                                <div><strong>Inschrijven: </strong><a href={race.register} target="_blank" rel="noopener noreferrer">klik hier</a></div> 
+                            : ''
+                        }
                         {race.description ? <div><strong>Bijzonderheden: </strong>{race.description}</div> : '' }
                         <div><strong>Deelnemers:</strong> 
                             {race.participants.map(p => {
@@ -128,7 +167,7 @@ class RaceCalendar extends Component {
                         </div>
                     </Card>
                 )})}
-                {(user.role !== "racer") && <AddRace />}
+                {(user.role !== "racer") && <div style={{marginTop: '30px'}}><AddRace /></div>}
             </div>
         )
     }
