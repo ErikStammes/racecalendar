@@ -33,8 +33,7 @@ class Register extends Component {
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
-        let token = /token=([^&]+)/.exec(window.location.href)[1]
-        this.props.register(values.name, values.email, values.password, token)
+        this.props.register(values.name, values.email, values.password, values.token)
       }
     });
   }
@@ -123,8 +122,14 @@ class Register extends Component {
                                         <Input type="password" onBlur={this.handleConfirmBlur} />
                                     )}
                                 </FormItem>
+                                <FormItem {...formItemLayout} label="Token">
+                                    {getFieldDecorator('token', 
+                                      { rules: [{ required: true, message: 'Vul een token in'}]})(
+                                        <Input/>
+                                    )}
+                                </FormItem>
                                 <FormItem {...tailFormItemLayout}>
-                                    <Button type="primary" htmlType="submit">Register</Button>
+                                    <Button type="primary" htmlType="submit">Registreren</Button>
                                 </FormItem>
                         </Form>
                     </div>

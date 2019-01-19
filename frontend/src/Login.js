@@ -56,7 +56,7 @@ class Login extends Component {
               <Row>
                 <Col span={6}></Col>
                 <Col span={12}>
-                <div style={{padding: 24, background: '#fff', borderRadius: '8px', textAlign: 'center'}}>
+                <div style={{padding: 24, paddingBottom: 12, background: '#fff', borderRadius: '8px', textAlign: 'center'}}>
                 {error && <h3>{error.response.data.message}</h3>}
                   <Form layout="inline" onSubmit={this.handleSubmit}>
                     <FormItem validateStatus={userNameError ? 'error' : ''} help={userNameError || ''}>
@@ -75,7 +75,9 @@ class Login extends Component {
                       </Button>
                     </FormItem>
                   </Form>
-                  
+                  <div style={{marginTop: '30px'}}>
+                    <a href="#/register">Registreren</a>
+                  </div>
                 </div>
                 </Col>
                 <Col span={6}></Col>
