@@ -34,7 +34,7 @@ const app = express()
 app.use(helmet())
 app.use(helmet.frameguard({
     action: 'allow-from',
-    domain: 'http://teamskits.nl'
+    domain: '' // <-- add your domain here
 }))
 app.use(cors())
 app.use(bodyParser.urlencoded({extended: true}))
@@ -95,7 +95,7 @@ var JwtStrategy = passportJWT.Strategy
 
 const jwtOptions = {
 	jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-	secretOrKey: 'eriksecret2018'
+	secretOrKey: '' // <-- add your secret here
 }
 
 var strategy = new JwtStrategy(jwtOptions, function(jwt_payload, next) {
@@ -151,7 +151,7 @@ app.post('/register', function (req, res) {
     if (!req.body.name || !req.body.password || !req.body.email) {
         return res.status(400).json({message: 'Not all fields supplied'})
     }
-    if (req.body.token.toLowerCase() !== 'spartaansebourgondiers') {
+    if (req.body.token.toLowerCase() !== '') { // <--- add your token here
         return res.status(401).json({message: 'Invalid token'})
     }
     let user = new User({
@@ -186,7 +186,7 @@ app.get('/me', PassportAuth, (req, res) =>
 
 app.get('/races', PassportAuth, (req, res) =>
     Race
-        .find({date: {"$gte": new Date()}})
+        // .find({date: {"$gte": new Date()}})
         .find()
         .sort({date: 'asc'})
         .populate({ path: 'participants', select: 'name', model: User })
@@ -242,18 +242,6 @@ app.delete('/race/:id/register/:signedup', PassportAuth, (req, res) => {
             res.send(race)
         })
 })
-
-// app.post('/race/:id/car', PassportAuth, (req, res) =>
-//     Race.findOne({ _id: req.params.id }, function (err, race) {
-//         if (err) return res.status(500).send(err)
-//         if (!race) return res.status(404).json({'Error': 'Race not found'})
-//         race.cars.push(req.user._id)
-//         race.save(function (err, updatedRace) {
-//             if (err) return res.status(500).send(err)
-//             res.send(updatedRace)
-//         })
-//     })
-// )
 
 let port = 80
 app.listen(port, () => logger.info('Listening on port '+port+'!'))
